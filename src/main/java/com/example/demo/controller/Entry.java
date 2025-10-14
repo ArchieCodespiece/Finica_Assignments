@@ -1,33 +1,48 @@
 package com.example.demo.controller;
 
 import com.example.demo.entity.Jornalentry;
-import com.example.demo.database.connect;
+import com.example.demo.service.Entryservice;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
+
 import java.util.List;
 
 @RestController
+@RequestMapping("/api/tasks")
 public class Entry {
 
-  private connect db = new connect();
+  private final Entryservice entryService;
 
-  @PostMapping("/api/tasks")
-  public void create(@RequestBody Jornalentry myentry) {
-    db.save(myentry);
+  // Constructor injection for service
+  public Entry(Entryservice entryService) {
+    this.entryService = entryService;
   }
 
-  @GetMapping("/api/tasks")
+  // Create a new task
+  @PostMapping
+  public ResponseEntity<Jornalentry> create(@RequestBody Jornalentry myentry) {
+    Jornalentry saved = entryService.save(myentry);
+    return ResponseEntity.ok(saved);
+  }
+
+  // Get all tasks
+  @GetMapping
   public List<Jornalentry> getAll() {
-    return db.getAll();
+    return entryService.getAll();
   }
 
-  @PutMapping("/api/tasks/{id}")
-  public void update(@PathVariable long id, @RequestBody Jornalentry myentry) {
+  // Update a task by id
+  @PutMapping("/{id}")
+  public ResponseEntity<Jornalentry> update(@PathVariable long id, @RequestBody Jornalentry myentry) {
     myentry.setId(id);
-    db.update(myentry);
+    Jornalentry updated = entryService.update(myentry);
+    return ResponseEntity.ok(updated);
   }
 
-  @DeleteMapping("/api/tasks/{id}")
-  public void delete(@PathVariable long id) {
-    db.delete(id);
+  // Delete a task by id
+  @DeleteMapping("/{id}")
+  public ResponseEntity<String> delete(@PathVariable long id) {
+    entryService.delete(id);
+    return ResponseEntity.ok("Deleted successfully");
   }
 }
