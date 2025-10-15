@@ -92,4 +92,30 @@ class EntryserviceTest {
         service.delete(id);
         verify(repository, times(1)).deleteById(id);
     }
+    @Test
+    void testGetByIdExists() {
+    Long id = 1L;
+    Jornalentry task = new Jornalentry();
+    task.setId(id);
+    task.setTaskDescription("Existing Task");
+
+    when(repository.findById(id)).thenReturn(java.util.Optional.of(task));
+
+    Jornalentry result = service.getById(id);
+    assertNotNull(result);
+    assertEquals("Existing Task", result.getTaskDescription());
+    verify(repository, times(1)).findById(id);
+}
+
+    @Test
+    void testGetByIdNotExists() {
+        Long id = 2L;
+
+        when(repository.findById(id)).thenReturn(java.util.Optional.empty());
+
+        Jornalentry result = service.getById(id);
+        assertNull(result);
+        verify(repository, times(1)).findById(id);
+}
+
 }
