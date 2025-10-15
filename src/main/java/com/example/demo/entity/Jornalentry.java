@@ -1,27 +1,25 @@
 package com.example.demo.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 
 @Entity
-@Table(name = "tasks")
 public class Jornalentry {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "task_description", nullable = false)
     private String taskDescription;
 
-    // Default constructor
     public Jornalentry() {}
 
-    // Constructor with taskDescription
     public Jornalentry(String taskDescription) {
         this.taskDescription = taskDescription;
     }
 
-    // Getters and setters
     public Long getId() {
         return id;
     }

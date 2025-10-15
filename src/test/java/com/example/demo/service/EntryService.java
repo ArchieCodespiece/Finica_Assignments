@@ -10,6 +10,7 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -20,7 +21,7 @@ class EntryserviceTest {
     private Entryrepo repository;
 
     @InjectMocks
-    private Entryservice service; // must be Entryservice, not Entryrepo
+    private Entryservice service;
 
     @BeforeEach
     void setUp() {
@@ -51,6 +52,36 @@ class EntryserviceTest {
         List<Jornalentry> allTasks = service.getAll();
         assertEquals(2, allTasks.size());
         verify(repository, times(1)).findAll();
+    }
+
+    @Test
+    void testGetById() {
+        Jornalentry t = new Jornalentry();
+        t.setId(1L);
+        t.setTaskDescription("Task 1");
+
+        when(repository.findById(1L)).thenReturn(Optional.of(t));
+
+        Jornalentry found = service.getById(1L);
+        assertNotNull(found);
+        assertEquals("Task 1", found.getTaskDescription());
+        verify(repository, times(1)).findById(1L);
+    }
+
+    @Test
+    void testUpdate() {
+        Jornalentry t = new Jornalentry();
+        t.setId(1L);
+        t.setTaskDescription("Updated Task");
+
+        when(repository.existsById(1L)).thenReturn(true);
+        when(repository.save(t)).thenReturn(t);
+
+        Jornalentry updated = service.update(t);
+        assertNotNull(updated);
+        assertEquals("Updated Task", updated.getTaskDescription());
+        verify(repository, times(1)).existsById(1L);
+        verify(repository, times(1)).save(t);
     }
 
     @Test
