@@ -29,40 +29,41 @@ class EntryControllerTest {
     }
 
     @Test
-    void testGetAllTasks() {
-        Jornalentry t1 = new Jornalentry();
-        t1.setTaskDescription("Task 1");
-        Jornalentry t2 = new Jornalentry();
-        t2.setTaskDescription("Task 2");
+    void testGetAllUsers() {
+        Jornalentry u1 = new Jornalentry("user1", "pass1", Arrays.asList("Task A", "Task B"));
+        Jornalentry u2 = new Jornalentry("user2", "pass2", Arrays.asList("Task C"));
 
-        when(entryService.getAll()).thenReturn(Arrays.asList(t1, t2));
+        when(entryService.getAll()).thenReturn(Arrays.asList(u1, u2));
 
-        List<Jornalentry> result = controller.getAllTasks();
+        List<Jornalentry> result = controller.getAllUsers();
+
         assertEquals(2, result.size());
+        assertEquals("user1", result.get(0).getUsername());
+        assertEquals(2, result.get(0).getTasks().size());
         verify(entryService, times(1)).getAll();
     }
 
     @Test
-    void testGetTaskByIdFound() {
-        Jornalentry task = new Jornalentry();
-        task.setId(1L);
-        task.setTaskDescription("Existing Task");
+    void testGetUserByIdFound() {
+        Jornalentry user = new Jornalentry("user1", "pass1", Arrays.asList("Task A"));
+        user.setId(1L);
 
-        when(entryService.getById(1L)).thenReturn(task);
+        when(entryService.getById(1L)).thenReturn(user);
 
-        ResponseEntity<Jornalentry> response = controller.getTaskById(1L);
+        ResponseEntity<Jornalentry> response = controller.getUserById(1L);
 
         assertEquals(200, response.getStatusCodeValue());
         assertNotNull(response.getBody());
-        assertEquals("Existing Task", response.getBody().getTaskDescription());
+        assertEquals("user1", response.getBody().getUsername());
+        assertEquals(1, response.getBody().getTasks().size());
         verify(entryService, times(1)).getById(1L);
     }
 
     @Test
-    void testGetTaskByIdNotFound() {
+    void testGetUserByIdNotFound() {
         when(entryService.getById(99L)).thenReturn(null);
 
-        ResponseEntity<Jornalentry> response = controller.getTaskById(99L);
+        ResponseEntity<Jornalentry> response = controller.getUserById(99L);
 
         assertEquals(404, response.getStatusCodeValue());
         assertNull(response.getBody());
@@ -70,37 +71,42 @@ class EntryControllerTest {
     }
 
     @Test
-    void testCreateTask() {
-        Jornalentry task = new Jornalentry();
-        task.setTaskDescription("New Task");
+    void testCreateUser() {
+        Jornalentry user = new Jornalentry("user3", "pass3", Arrays.asList("Task X"));
 
-        when(entryService.save(task)).thenReturn(task);
+        when(entryService.save(user)).thenReturn(user);
 
-        ResponseEntity<Jornalentry> response = controller.createTask(task);
+        ResponseEntity<Jornalentry> response = controller.createUser(user);
+
         assertEquals(201, response.getStatusCodeValue());
-        assertEquals("New Task", response.getBody().getTaskDescription());
-        verify(entryService, times(1)).save(task);
+        assertEquals("user3", response.getBody().getUsername());
+        assertEquals(1, response.getBody().getTasks().size());
+        verify(entryService, times(1)).save(user);
     }
 
     @Test
-    void testUpdateTask() {
-        Jornalentry task = new Jornalentry();
-        task.setTaskDescription("Updated Task");
+    void testUpdateUser() {
+        Jornalentry user = new Jornalentry("user1", "newpass", Arrays.asList("Updated Task"));
+        user.setId(1L);
 
-        when(entryService.update(any())).thenReturn(task);
+        when(entryService.update(user)).thenReturn(user);
 
-        ResponseEntity<Jornalentry> response = controller.updateTask(1L, task);
+        ResponseEntity<Jornalentry> response = controller.updateUser(1L, user);
+
         assertEquals(200, response.getStatusCodeValue());
-        verify(entryService, times(1)).update(any());
+        assertEquals("newpass", response.getBody().getPassword());
+        assertEquals(1, response.getBody().getTasks().size());
+        verify(entryService, times(1)).update(user);
     }
 
     @Test
-    void testDeleteTask() {
+    void testDeleteUser() {
         doNothing().when(entryService).delete(1L);
 
-        ResponseEntity<String> response = controller.deleteTask(1L);
+        ResponseEntity<String> response = controller.deleteUser(1L);
+
         assertEquals(200, response.getStatusCodeValue());
-        assertEquals("Deleted successfully", response.getBody());
+        assertEquals("User deleted successfully", response.getBody());
         verify(entryService, times(1)).delete(1L);
     }
 }

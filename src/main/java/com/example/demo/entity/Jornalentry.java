@@ -1,23 +1,30 @@
 package com.example.demo.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import java.util.List;
 
 @Entity
+@Table(name = "users")
 public class Jornalentry {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String taskDescription;
+    private String username;
+    private String password;
+
+    @ElementCollection
+    @CollectionTable(name = "user_tasks", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "task_description")
+    private List<String> tasks;
 
     public Jornalentry() {}
 
-    public Jornalentry(String taskDescription) {
-        this.taskDescription = taskDescription;
+    public Jornalentry(String username, String password, List<String> tasks) {
+        this.username = username;
+        this.password = password;
+        this.tasks = tasks;
     }
 
     public Long getId() {
@@ -28,11 +35,27 @@ public class Jornalentry {
         this.id = id;
     }
 
-    public String getTaskDescription() {
-        return taskDescription;
+    public String getUsername() {
+        return username;
     }
 
-    public void setTaskDescription(String taskDescription) {
-        this.taskDescription = taskDescription;
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public List<String> getTasks() {
+        return tasks;
+    }
+
+    public void setTasks(List<String> tasks) {
+        this.tasks = tasks;
     }
 }

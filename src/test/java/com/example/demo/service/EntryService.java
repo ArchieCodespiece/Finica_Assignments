@@ -30,58 +30,67 @@ class EntryserviceTest {
 
     @Test
     void testSave() {
-        Jornalentry task = new Jornalentry();
-        task.setTaskDescription("Test Task");
+        Jornalentry user = new Jornalentry("user1", "pass1", Arrays.asList("Task A"));
+        when(repository.save(user)).thenReturn(user);
 
-        when(repository.save(task)).thenReturn(task);
-
-        Jornalentry saved = service.save(task);
-        assertEquals("Test Task", saved.getTaskDescription());
-        verify(repository, times(1)).save(task);
+        Jornalentry saved = service.save(user);
+        assertNotNull(saved);
+        assertEquals("user1", saved.getUsername());
+        assertEquals(1, saved.getTasks().size());
+        verify(repository, times(1)).save(user);
     }
 
     @Test
     void testGetAll() {
-        Jornalentry t1 = new Jornalentry();
-        t1.setTaskDescription("Task 1");
-        Jornalentry t2 = new Jornalentry();
-        t2.setTaskDescription("Task 2");
+        Jornalentry u1 = new Jornalentry("user1", "pass1", Arrays.asList("Task 1", "Task 2"));
+        Jornalentry u2 = new Jornalentry("user2", "pass2", Arrays.asList("Task 3"));
 
-        when(repository.findAll()).thenReturn(Arrays.asList(t1, t2));
+        when(repository.findAll()).thenReturn(Arrays.asList(u1, u2));
 
-        List<Jornalentry> allTasks = service.getAll();
-        assertEquals(2, allTasks.size());
+        List<Jornalentry> allUsers = service.getAll();
+        assertEquals(2, allUsers.size());
+        assertEquals("user1", allUsers.get(0).getUsername());
+        assertEquals(2, allUsers.get(0).getTasks().size());
         verify(repository, times(1)).findAll();
     }
 
     @Test
-    void testGetById() {
-        Jornalentry t = new Jornalentry();
-        t.setId(1L);
-        t.setTaskDescription("Task 1");
+    void testGetByIdExists() {
+        Jornalentry user = new Jornalentry("user1", "pass1", Arrays.asList("Task 1"));
+        user.setId(1L);
 
-        when(repository.findById(1L)).thenReturn(Optional.of(t));
+        when(repository.findById(1L)).thenReturn(Optional.of(user));
 
         Jornalentry found = service.getById(1L);
         assertNotNull(found);
-        assertEquals("Task 1", found.getTaskDescription());
+        assertEquals("user1", found.getUsername());
+        assertEquals(1, found.getTasks().size());
         verify(repository, times(1)).findById(1L);
     }
 
     @Test
+    void testGetByIdNotExists() {
+        when(repository.findById(99L)).thenReturn(Optional.empty());
+
+        Jornalentry result = service.getById(99L);
+        assertNull(result);
+        verify(repository, times(1)).findById(99L);
+    }
+
+    @Test
     void testUpdate() {
-        Jornalentry t = new Jornalentry();
-        t.setId(1L);
-        t.setTaskDescription("Updated Task");
+        Jornalentry user = new Jornalentry("user1", "newpass", Arrays.asList("Updated Task"));
+        user.setId(1L);
 
         when(repository.existsById(1L)).thenReturn(true);
-        when(repository.save(t)).thenReturn(t);
+        when(repository.save(user)).thenReturn(user);
 
-        Jornalentry updated = service.update(t);
+        Jornalentry updated = service.update(user);
         assertNotNull(updated);
-        assertEquals("Updated Task", updated.getTaskDescription());
+        assertEquals("newpass", updated.getPassword());
+        assertEquals(1, updated.getTasks().size());
         verify(repository, times(1)).existsById(1L);
-        verify(repository, times(1)).save(t);
+        verify(repository, times(1)).save(user);
     }
 
     @Test
@@ -92,30 +101,4 @@ class EntryserviceTest {
         service.delete(id);
         verify(repository, times(1)).deleteById(id);
     }
-    @Test
-    void testGetByIdExists() {
-    Long id = 1L;
-    Jornalentry task = new Jornalentry();
-    task.setId(id);
-    task.setTaskDescription("Existing Task");
-
-    when(repository.findById(id)).thenReturn(java.util.Optional.of(task));
-
-    Jornalentry result = service.getById(id);
-    assertNotNull(result);
-    assertEquals("Existing Task", result.getTaskDescription());
-    verify(repository, times(1)).findById(id);
-}
-
-    @Test
-    void testGetByIdNotExists() {
-        Long id = 2L;
-
-        when(repository.findById(id)).thenReturn(java.util.Optional.empty());
-
-        Jornalentry result = service.getById(id);
-        assertNull(result);
-        verify(repository, times(1)).findById(id);
-}
-
 }
