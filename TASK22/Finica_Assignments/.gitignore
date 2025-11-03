@@ -1,0 +1,30 @@
+# ======== Java / Spring Boot ========
+target/
+*.log
+*.class
+*.jar
+*.war
+*.ear
+
+# IntelliJ / Eclipse / VS Code
+.idea/
+*.iml
+.vscode/
+*.project
+*.classpath
+.settings/
+
+# ======== Flutter / Dart ========
+build/
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+pubspec.lock
+*.lock
+*.DS_Store
+*.log
+
+# ======== OS junk ========
+.DS_Store
+Thumbs.db
